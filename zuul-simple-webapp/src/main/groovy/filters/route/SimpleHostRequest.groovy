@@ -161,6 +161,7 @@ class SimpleHostRoutingFilter extends ZuulFilter {
 
     Object run() {
         HttpServletRequest request = RequestContext.currentContext.getRequest();
+		Debug.addRequestDebug("GREY::"+request.getRequestURI())
         Header[] headers = buildZuulRequestHeaders(request)
         String verb = getVerb(request);
         InputStream requestEntity = getRequestBody(request)

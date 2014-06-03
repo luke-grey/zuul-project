@@ -1,0 +1,5 @@
+{
+	"//pi": "http://54.241.52.190:9090/",
+	"//test":"http://apache.org/",
+	"//simple":"http://localhost:8081/SimpleAPIService/"
+}

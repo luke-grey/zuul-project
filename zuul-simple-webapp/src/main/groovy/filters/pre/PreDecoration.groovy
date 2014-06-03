@@ -16,6 +16,7 @@
 
 import com.netflix.zuul.ZuulFilter
 import com.netflix.zuul.context.RequestContext
+import com.netflix.zuul.context.Debug
 
 /**
  * @author mhawthorne
@@ -34,15 +35,18 @@ class PreDecorationFilter extends ZuulFilter {
 
     @Override
     boolean shouldFilter() {
+		
         return true;
     }
 
     @Override
     Object run() {
-        RequestContext ctx = RequestContext.getCurrentContext()
-
+        RequestContext ctx = RequestContext.getCurrentContext();
+		
+		Debug.addRequestDebug("GREY::"+ctx.request.getRequestURI());
         // sets origin
-        ctx.setRouteHost(new URL("http://apache.org/"));
+		
+        ctx.setRouteHost(new URL("http://54.241.52.190:9090/"));
 
         // sets custom header to send to the origin
         ctx.addOriginResponseHeader("cache-control", "max-age=3600");
