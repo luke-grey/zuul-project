@@ -13,7 +13,7 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient:4.3.2'
 	compile 'org.springframework:spring-core:4.0.5.RELEASE'
 	
-	compile 'junit:junit-dep:4+'
+	compile 'junit:junit-dep:4.11'
 	
     provided 'javax.servlet:servlet-api:2.5'
 	
