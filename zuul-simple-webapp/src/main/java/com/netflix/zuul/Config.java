@@ -12,6 +12,7 @@ import org.springframework.core.io.ClassPathResource;
  * Config.java
  *
  * @author Kevin Albert | productOps, Inc.
+ * With an accessor method by Luke Grey
  */
 public class Config {
 
@@ -25,6 +26,9 @@ public class Config {
             e.printStackTrace();
             keyValueMap = new HashMap<String, String>();
         }
+    }
+    public Map<String,String> getMap(){
+    	return keyValueMap;
     }
 
     public String get(String key) {

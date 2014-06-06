@@ -14,7 +14,9 @@
  *      limitations under the License.
  */
 
+import com.netflix.zuul.Config
 import com.netflix.zuul.ZuulFilter
+import com.netflix.zuul.ZuulFilterResult
 import com.netflix.zuul.context.RequestContext
 import com.netflix.zuul.context.Debug
 
@@ -35,21 +37,34 @@ class PreDecorationFilter extends ZuulFilter {
 
     @Override
     boolean shouldFilter() {
-		
         return true;
     }
 
     @Override
     Object run() {
+		/*
         RequestContext ctx = RequestContext.getCurrentContext();
 		
-		Debug.addRequestDebug("GREY::"+ctx.request.getRequestURI());
+		Config config = new Config("config.json");
+		Debug.addRequestDebug("GREY::URI::"+ctx.request.getRequestURI())
+		
+		if( config.getMap().containsKey(ctx.request.getRequestURI()) ){
+			Debug.addRequestDebug("GREY::HOST::"+config.get(ctx.request.getRequestURI()))
+			ctx.setRouteHost(new URL(config.get(ctx.request.getRequestURI())))
+		}
+		else{ 
+			Debug.addRequestDebug("GREY::Throwing Result!")
+			ZuulFilterResult z =new ZuulFilterResult();
+			z.setException(new Throwable("Failed to find URI on gateway."));
+			throw z.getException();
+		}
+		
         // sets origin
 		
-        ctx.setRouteHost(new URL("http://54.241.52.190:9090/"));
 
         // sets custom header to send to the origin
         ctx.addOriginResponseHeader("cache-control", "max-age=3600");
+        */
     }
 
 }
