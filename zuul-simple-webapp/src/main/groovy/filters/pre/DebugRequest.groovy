@@ -18,12 +18,7 @@ package filters.pre
 import com.netflix.zuul.ZuulFilter
 import com.netflix.zuul.context.Debug
 import com.netflix.zuul.context.RequestContext
-import org.junit.Assert
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.runners.MockitoJUnitRunner
+
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse

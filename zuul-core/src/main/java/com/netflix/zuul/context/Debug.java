@@ -131,27 +131,4 @@ public class Debug {
 
     }
 
-
-    @RunWith(MockitoJUnitRunner.class)
-    public static class UnitTest {
-
-        @Test
-        public void testRequestDebug() {
-            assertFalse(debugRouting());
-            assertFalse(debugRequest());
-            setDebugRouting(true);
-            setDebugRequest(true);
-            assertTrue(debugRouting());
-            assertTrue(debugRequest());
-
-            addRoutingDebug("test1");
-            assertTrue(getRoutingDebug().contains("test1"));
-
-            addRequestDebug("test2");
-            assertTrue(getRequestDebug().contains("test2"));
-
-
-        }
-    }
-
 }
