@@ -11,7 +11,7 @@ class TestGate extends ZuulFilter {
 
     @Override
     int filterOrder() {
-        return 6
+        return 8
     }
 
     @Override

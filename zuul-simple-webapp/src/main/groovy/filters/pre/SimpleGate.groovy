@@ -11,7 +11,7 @@ class SimpleGate extends ZuulFilter {
 
     @Override
     int filterOrder() {
-        return 6
+        return 7
     }
 
     @Override
