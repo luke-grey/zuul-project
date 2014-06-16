@@ -13,6 +13,7 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
+package filters.pre;
 
 import com.netflix.zuul.Config
 import com.netflix.zuul.ZuulFilter
@@ -21,13 +22,13 @@ import com.netflix.zuul.context.RequestContext
 import com.netflix.zuul.context.Debug
 
 /**
- * @author mhawthorne
+ * Author: Luke Grey | productOps, Inc.
  */
-class PreDecorationFilter extends ZuulFilter {
+class KeyAdderFilter extends ZuulFilter {
 
     @Override
     int filterOrder() {
-        return 5
+        return 1
     }
 
     @Override
@@ -37,34 +38,14 @@ class PreDecorationFilter extends ZuulFilter {
 
     @Override
     boolean shouldFilter() {
-        return true;
+		return true;
     }
 
     @Override
     Object run() {
-		/*
-        RequestContext ctx = RequestContext.getCurrentContext();
-		
-		Config config = new Config("config.json");
-		Debug.addRequestDebug("GREY::URI::"+ctx.request.getRequestURI())
-		
-		if( config.getMap().containsKey(ctx.request.getRequestURI()) ){
-			Debug.addRequestDebug("GREY::HOST::"+config.get(ctx.request.getRequestURI()))
-			ctx.setRouteHost(new URL(config.get(ctx.request.getRequestURI())))
-		}
-		else{ 
-			Debug.addRequestDebug("GREY::Throwing Result!")
-			ZuulFilterResult z =new ZuulFilterResult();
-			z.setException(new Throwable("Failed to find URI on gateway."));
-			throw z.getException();
-		}
-		
-        // sets origin
-		
-
-        // sets custom header to send to the origin
-        ctx.addOriginResponseHeader("cache-control", "max-age=3600");
-        */
+		RequestContext ctx = RequestContext.getCurrentContext();
+		ctx.addZuulRequestHeader("key","1234567890");
+		//Debug.addRequestDebug("GREY::"+ctx.request.getRequestURI())
     }
 
 }

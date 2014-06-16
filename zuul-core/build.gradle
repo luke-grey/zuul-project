@@ -29,6 +29,7 @@ javadoc {
 }
 
 eclipse {
+	//containers 'DROOLS/Drools', 'GROOVY_SUPPORT', 'GROOVY_DSL_SUPPORT', 'com.springsource.ide.eclipse.gradle.classpathcontainer'
     classpath {
         plusConfigurations += configurations.provided
         downloadSources = true

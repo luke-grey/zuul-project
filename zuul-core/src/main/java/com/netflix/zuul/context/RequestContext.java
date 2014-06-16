@@ -54,6 +54,7 @@ import com.netflix.zuul.util.DeepCopy;
  *         Date: 10/13/11
  *         Time: 10:21 AM
  */
+@SuppressWarnings("serial")
 public class RequestContext extends ConcurrentHashMap<String, Object> {
 
     private static final Logger LOG = LoggerFactory.getLogger(RequestContext.class);
@@ -402,6 +403,104 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
         getResponse().setStatus(nStatusCode);
         set("responseStatusCode", nStatusCode);
     }
+    
+    /**
+     * Determines if this request should continueFiltering. defaults to true.
+     * 
+     * @return boolean
+     * 
+     */
+    public boolean getContinueFiltering(){
+    	if (get("continueFiltering") == null) {
+    		putIfAbsent("continueFiltering",Boolean.TRUE);
+    	}
+    	return (boolean) get("continueFiltering");
+    }
+    
+    /**
+     * Sets the continueFiltering Attribute to false
+     * 
+     */
+    public void stopFiltering(){
+    	if (get("continueFiltering") == null){
+    		putIfAbsent("continueFiltering",Boolean.FALSE);
+    		return;
+    	}
+    	set("continueFiltering",Boolean.FALSE);
+    }
+    
+    /**
+     * Determines if this request has a key. defaults to false.
+     * 
+     * @return boolean
+     * 
+     */
+    public boolean getHasKey(){
+    	if (get("hasKey") == null) {
+    		putIfAbsent("hasKey",Boolean.FALSE);
+    	}
+    	return (boolean) get("hasKey");
+    }
+    
+    /**
+     * Sets the hasKey Attribute
+     * 
+     * @param val
+     * 
+     */
+    public void setHasKey(boolean val){
+    		set("hasKey",val);
+    }
+    
+    /**
+     * Adds a new key to a request
+     * 
+     * @param key
+     * 
+     */
+    public void setPermissionKey(String key){
+    	set("permissionKey",key);
+    }
+
+    /**
+     * Returns the key for this request
+     * 
+     * @return boolean
+     * 
+     */
+    public String getPermissionKey(){
+    	if (get("permissionKey") == null) {
+    		putIfAbsent("permissionKey","");
+    	}
+    	return (String) get("permissionKey");
+    }
+    
+    /**
+     * Adds a key permission to a request
+     * 
+     * @param key
+     * @param value
+     * 
+     */
+    public void addRequestPermission(String value){
+    	getRequestPermissions().add(value);
+    }
+    
+    /**
+     * Returns the List with all keys and permissions
+     * 
+     * @return ArrayList<String>
+     * 
+     */
+    @SuppressWarnings("unchecked")
+	public ArrayList<String> getRequestPermissions(){
+    	if (get("requestPermissions") == null) {
+            ArrayList<String> requestPermissions
+            = (ArrayList<String>) new ArrayList<String>();
+            putIfAbsent("requestPermissions", requestPermissions);
+        }
+    	return (ArrayList<String>) get("requestPermissions");
+    }
 
     /**
      * add a header to be sent to the origin
@@ -418,7 +517,8 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
      *
      * @return the list of requestHeaders to be sent to the origin
      */
-    public Map<String, String> getZuulRequestHeaders() {
+    @SuppressWarnings("unchecked")
+	public Map<String, String> getZuulRequestHeaders() {
         if (get("zuulRequestHeaders") == null) {
             HashMap<String, String> zuulRequestHeaders = new HashMap<String, String>();
             putIfAbsent("zuulRequestHeaders", zuulRequestHeaders);
@@ -441,7 +541,8 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
      *
      * @return a List<Pair<String, String>>  of response headers
      */
-    public List<Pair<String, String>> getZuulResponseHeaders() {
+    @SuppressWarnings("unchecked")
+	public List<Pair<String, String>> getZuulResponseHeaders() {
         if (get("zuulResponseHeaders") == null) {
             List<Pair<String, String>> zuulRequestHeaders = new ArrayList<Pair<String, String>>();
             putIfAbsent("zuulResponseHeaders", zuulRequestHeaders);
@@ -454,7 +555,8 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
      *
      * @return the List<Pair<String, String>> of headers sent back from the origin
      */
-    public List<Pair<String, String>> getOriginResponseHeaders() {
+    @SuppressWarnings("unchecked")
+	public List<Pair<String, String>> getOriginResponseHeaders() {
         if (get("originResponseHeaders") == null) {
             List<Pair<String, String>> originResponseHeaders = new ArrayList<Pair<String, String>>();
             putIfAbsent("originResponseHeaders", originResponseHeaders);
@@ -567,7 +669,8 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
     /**
      * @return Map<String, List<String>>  of the request Query Parameters
      */
-    public Map<String, List<String>> getRequestQueryParams() {
+    @SuppressWarnings("unchecked")
+	public Map<String, List<String>> getRequestQueryParams() {
         return (Map<String, List<String>>) get("requestQueryParams");
     }
 
@@ -638,11 +741,12 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
         }
 
 
-        @Test
+        @SuppressWarnings("rawtypes")
+		@Test
         public void testResponseHeaders() {
             RequestContext context = RequestContext.getCurrentContext();
             context.addZuulRequestHeader("header", "test");
-            Map headerMap = context.getZuulRequestHeaders();
+			Map headerMap = context.getZuulRequestHeaders();
             assertNotNull(headerMap);
             assertEquals(headerMap.get("header"), "test");
         }
