@@ -11,8 +11,13 @@ import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
+## Author: Luke Grey | ProductOps, Inc.
+##
 ## The type alternatives are pretty basic.
 ## It's a good idea to divide this thing into
 ## three different templates, or a template for each purpose:
@@ -31,7 +36,7 @@ import java.io.*;
 ##  -order:()
 ##  -uri:()in form "/..."
 ##  -host:()
-##  -key:()still unsure about
+##  -key:()
 ##  -daylimit:()
 ##  -monthlimit:()
 ## transform:
@@ -49,52 +54,55 @@ import java.io.*;
 
 public class FilterConstructor{
 	
-    public FilterConstructor(String templateFile){
-    	
+    public FilterConstructor(HashMap<String,Object> filterValues){
         try{
-        	Velocity.init();  //"velo.properties");
+        	Velocity.init();
         	
         	VelocityContext context = new VelocityContext();
         	
-            //context.put("list");
         	Template template =  null;
         
         	try{
-        		template = Velocity.getTemplate(templateFile);
+        		template = Velocity.getTemplate("src/main/resources/org/gradle/"+filterValues.get("template")+".groovy.vm");
             
         	}catch( ResourceNotFoundException rnfe ){
         	
-        		System.out.println("Example : error : cannot find template " + templateFile );
+        		System.out.println("Example : error : cannot find template " 
+        		+ filterValues.get("template")+".groovy.vm" );
             
         	}catch( ParseErrorException pee ){
         	
-        		System.out.println("Example : Syntax error in template " + templateFile + ":" + pee );
+        		System.out.println("Example : Syntax error in template " 
+        		+ filterValues.get("template")+".groovy.vm" + ":" + pee );
             
         	}
-        	//Config config = new Config("config.json");
+
+        	context.put("name", filterValues.get("name"));
+			context.put("order", filterValues.get("order"));
+			context.put("type", filterValues.get("type"));
+			context.put("disabled", filterValues.get("disabled"));
+			
+        	switch((String) filterValues.get("template")){
+        		case "secGate":
+        			context.put("endpoint", filterValues.get("endpoint"));
+        			context.put("host", filterValues.get("host"));
+        			context.put("api", filterValues.get("api"));
+        			break;
+        		case "key":
+        			context.put("key",filterValues.get("key"));
+        			context.put("endpoints",filterValues.get("endpoints") );
+        			break;
+        		default:
+        			
+        			break;
+        	}
         	
-        	//for(Map.Entry<String,String> entry: config.getMap().entrySet() ){
-        		//context.put(entry.getKey(), entry.getValue());
+        	String fTemp= ((String)filterValues.get("template")).substring(0,1).toUpperCase()+
+        			((String)filterValues.get("template")).substring(1);
         	
-        	//this bit is lame but i dont know where or how the data is coming at this yet.
-        	String uri="/pi";
-        	String host="http://54.241.52.190:9090/";
-        	String filterType="pre";
-        	String filterOrder="6";
-        	String fileName="PiGate";
-        	
-        	context.put("uri", uri);
-        	context.put("host", host);
-        	context.put("type", filterType);
-        	context.put("order", filterOrder);
-        	context.put("name", fileName);
-        	
-        	//}
-        	//this bit will also need to be changed to some cassandra... upload... thing
-        	//or maybe also be a passed variable. who knows where these things will need to go
-        	//i do, of course. any of the three filter folders in the Filter Persistence section of the diagram
             Writer writer = new BufferedWriter(new PrintWriter(new FileOutputStream
-            		("../zuul-simple-webapp/src/main/groovy/filters/"+filterType+"/"+fileName+".groovy")));
+            ("../zuul-simple-webapp/src/main/groovy/filters/"
+            +filterValues.get("type")+"/"+filterValues.get("name")+ fTemp+".groovy")));
 
             if ( template != null)
                     template.merge(context, writer);
@@ -106,8 +114,33 @@ public class FilterConstructor{
             System.out.println(e);
         }
     }
+    
     public static void main(String[] args){
-	
-    	FilterConstructor t = new FilterConstructor("/src/main/resources/org/gradle/filter.groovy.vm");
+    	HashMap<String,Object> gate=new HashMap<String,Object>();
+    	gate.put("template", "secGate");
+    	gate.put("name", "Simple");
+    	gate.put("order", "13");
+    	gate.put("type", "pre");
+    	gate.put("endpoint","/simple");
+    	gate.put("host","http://localhost:8081/");
+    	gate.put("api", "/SimpleAPIService");
+    	gate.put("disabled", false);
+    	
+    	List<String> endpoints= new ArrayList<String>();
+    	endpoints.add("/apache");
+    	endpoints.add("/pi");
+    	endpoints.add("/simple");
+    	
+    	HashMap<String,Object> keyFilter=new HashMap<String,Object>();
+    	keyFilter.put("template","key");
+    	keyFilter.put("name", "Inc01");
+    	keyFilter.put("order","3");
+    	keyFilter.put("type", "pre");
+    	keyFilter.put("key","1234567890");
+    	keyFilter.put("endpoints",endpoints);
+    	keyFilter.put("disabled",false);
+    	@SuppressWarnings("unused")
+		FilterConstructor t = new FilterConstructor(keyFilter);
     }
+    
 }

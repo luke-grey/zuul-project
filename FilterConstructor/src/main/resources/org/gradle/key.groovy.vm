@@ -1,0 +1,46 @@
+## This filter should check a request's header for keys
+## then, through the context, give that request certain
+## permissions. 
+## These need a 10-char key, api information
+## 
+## Author Luke Grey | productOps, Inc.
+## 
+package filters.pre;
+import com.netflix.zuul.ZuulFilter
+import com.netflix.zuul.ZuulFilterResult
+import com.netflix.zuul.context.RequestContext
+import com.netflix.zuul.context.Debug
+
+class $name extends ZuulFilter {
+
+    @Override
+    int filterOrder() {
+        return $order
+    }
+
+    @Override
+    String filterType() {
+        return "pre"
+    }
+
+    @Override
+    boolean shouldFilter() {
+#if(!$disabled)
+		RequestContext ctx = RequestContext.getCurrentContext()
+		
+		if(!ctx.getContinueFiltering)
+			return false;
+			
+		if(ctx.getHasKey())
+			return ctx.getPermissionKey()=="$key"#end
+		return false;
+    }
+
+    @Override
+    Object run() {
+        RequestContext ctx = RequestContext.getCurrentContext();
+#foreach($endpoint in $endpoints)
+		ctx.addRequestPermission("$endpoint")#end
+    }
+
+}

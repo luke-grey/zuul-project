@@ -40,6 +40,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Multimap;
 import com.netflix.util.Pair;
 import com.netflix.zuul.constants.ZuulHeaders;
 import com.netflix.zuul.util.DeepCopy;
@@ -392,7 +393,6 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
         return get("responseStatusCode") != null ? (Integer) get("responseStatusCode") : 500;
     }
 
-
     /**
      * Use this instead of response.setStatusCode()
      *
@@ -401,6 +401,103 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
     public void setResponseStatusCode(int nStatusCode) {
         getResponse().setStatus(nStatusCode);
         set("responseStatusCode", nStatusCode);
+    }
+
+    /**
+     * Determines if this request should continueFiltering. defaults to true.
+     * 
+     * @return boolean
+     * 
+     */
+    public boolean getContinueFiltering(){
+    	if (get("continueFiltering") == null) {
+    		putIfAbsent("continueFiltering",Boolean.TRUE);
+    	}
+    	return (boolean) get("continueFiltering");
+    }
+    
+    /**
+     * Sets the continueFiltering Attribute to false
+     * 
+     */
+    public void stopFiltering(){
+    	if (get("continueFiltering") == null){
+    		putIfAbsent("continueFiltering",Boolean.FALSE);
+    		return;
+    	}
+    	set("continueFiltering",Boolean.FALSE);
+    }
+    
+    /**
+     * Determines if this request has a key. defaults to false.
+     * 
+     * @return boolean
+     * 
+     */
+    public boolean getHasKey(){
+    	if (get("hasKey") == null) {
+    		putIfAbsent("hasKey",Boolean.FALSE);
+    	}
+    	return (boolean) get("hasKey");
+    }
+    
+    /**
+     * Sets the hasKey Attribute
+     * 
+     * @param val
+     * 
+     */
+    public void setHasKey(boolean val){
+    		set("hasKey",val);
+    }
+    
+    /**
+     * Adds a new key to a request
+     * 
+     * @param key
+     * 
+     */
+    public void setPermissionKey(String key){
+    	set("permissionKey",key);
+    }
+
+    /**
+     * Returns the key for this request
+     * 
+     * @return boolean
+     * 
+     */
+    public String getPermissionKey(){
+    	if (get("permissionKey") == null) {
+    		putIfAbsent("permissionKey","");
+    	}
+    	return (String) get("permissionKey");
+    }
+    
+    /**
+     * Adds a key permission to a request
+     * 
+     * @param key
+     * @param value
+     * 
+     */
+    public void addRequestPermission(String value){
+    	getRequestPermissions().add(value);
+    }
+    
+    /**
+     * Returns the List with all keys and permissions
+     * 
+     * @return ArrayList<String>
+     * 
+     */
+    public ArrayList<String> getRequestPermissions(){
+    	if (get("requestPermissions") == null) {
+            ArrayList<String> requestPermissions
+            = (ArrayList<String>) new ArrayList<String>();
+            putIfAbsent("requestPermissions", requestPermissions);
+        }
+    	return (ArrayList<String>) get("requestPermissions");
     }
 
     /**
@@ -424,6 +521,27 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
             putIfAbsent("zuulRequestHeaders", zuulRequestHeaders);
         }
         return (Map<String, String>) get("zuulRequestHeaders");
+    }
+    
+    /**
+     * get the URI outside the request object.
+     *
+     * @return String
+     */
+    public String getRequestURI(){
+    	if(get("requestURI")==null){
+    		putIfAbsent("requestURI","");
+    	}
+    	return (String) get("requestURI");
+    }
+    
+    /**
+     * set the URI outside the request object.
+     *
+     * @param String uri
+     */
+    public void setRequestURI(String uri){
+    	set("requestURI",uri);
     }
 
     /**

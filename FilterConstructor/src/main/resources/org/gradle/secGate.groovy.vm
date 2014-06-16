@@ -3,14 +3,19 @@
 ## for the production of gateway filters for Zuul.
 ## It's mostly testing right now.
 ##
-## Author: Luke Grey
+## Author Luke Grey | productOps, Inc.
 ## 
+## if we decide that each incoming request MUST have a key
+## OR we have a section where the secured gates lie behind the key filters
+## and the unsecured gates are jumped to if there is no key in the header
+package filters.pre;
 import com.netflix.zuul.ZuulFilter
 import com.netflix.zuul.ZuulFilterResult
 import com.netflix.zuul.context.RequestContext
 import com.netflix.zuul.context.Debug
+import java.util.Map.Entry
 
-class $name extends ZuulFilter {
+class ${name}SecGate extends ZuulFilter {
 
     @Override
     int filterOrder() {
@@ -19,16 +24,21 @@ class $name extends ZuulFilter {
 
     @Override
     String filterType() {
-        return "$type"
+        return "pre"
     }
 
     @Override
     boolean shouldFilter() {
+#if(!$disabled)
 		RequestContext ctx = RequestContext.getCurrentContext();
-		
-		if("$uri"==ctx.request.getRequestURI())
-			return true;
+		if(!ctx.getContinueFiltering)
+			return false;
 			
+		if(!ctx.getRequestPermissions().isEmpty()){
+	        if(ctx.request.getRequestURI()=="$endpoint"){
+				return ctx.getRequestPermissions().contains("$endpoint");
+			}
+		}#end
 		return false;
     }
 
@@ -39,9 +49,8 @@ class $name extends ZuulFilter {
         // sets origin
 		ctx.setRouteHost(new URL("$host"));
 
-        // sets custom header to send to the origin
-        ctx.addOriginResponseHeader("cache-control", "max-age=3600");
-		
+        // sets custom uri to send to the server
+        ctx.setRequestURI("$api");
     }
 
 }
