@@ -503,6 +503,27 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
     }
 
     /**
+     * get the URI outside the request object.
+     *
+     * @return String
+     */
+    public String getRequestURI(){
+    	if(get("requestURI")==null){
+    		putIfAbsent("requestURI","");
+    	}
+    	return (String) get("requestURI");
+    }
+    
+    /**
+     * set the URI outside the request object.
+     *
+     * @param String uri
+     */
+    public void setRequestURI(String uri){
+    	set("requestURI",uri);
+    }
+
+    /**
      * add a header to be sent to the origin
      *
      * @param name

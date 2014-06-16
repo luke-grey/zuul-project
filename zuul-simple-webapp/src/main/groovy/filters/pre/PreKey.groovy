@@ -27,7 +27,7 @@ class PreKeyFilter extends ZuulFilter {
 
     @Override
     int filterOrder() {
-        return 2 
+        return 3 
     }
 
     @Override
@@ -43,7 +43,7 @@ class PreKeyFilter extends ZuulFilter {
     @Override
     Object run() {
 		RequestContext ctx = RequestContext.getCurrentContext();
-		String k= ctx.getZuulRequestHeaders().get("key");
+		String k = ctx.getZuulRequestHeaders().get("key");
 		if(k==null)
 			ctx.stopFiltering();
 		else{

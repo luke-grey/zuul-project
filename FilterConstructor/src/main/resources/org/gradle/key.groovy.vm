@@ -28,11 +28,12 @@ class $name extends ZuulFilter {
 #if(!$disabled)
 		RequestContext ctx = RequestContext.getCurrentContext()
 		
-		if(!ctx.getContinueFiltering)
+		if(!ctx.getContinueFiltering())
 			return false;
 			
 		if(ctx.getHasKey())
 			return ctx.getPermissionKey()=="$key"#end
+
 		return false;
     }
 
@@ -40,7 +41,8 @@ class $name extends ZuulFilter {
     Object run() {
         RequestContext ctx = RequestContext.getCurrentContext();
 #foreach($endpoint in $endpoints)
-		ctx.addRequestPermission("$endpoint")#end
+		ctx.addRequestPermission("$endpoint")
+#end
     }
 
 }

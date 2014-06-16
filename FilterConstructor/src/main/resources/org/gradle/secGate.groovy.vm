@@ -31,14 +31,15 @@ class ${name}SecGate extends ZuulFilter {
     boolean shouldFilter() {
 #if(!$disabled)
 		RequestContext ctx = RequestContext.getCurrentContext();
-		if(!ctx.getContinueFiltering)
+		if(!ctx.getContinueFiltering())
 			return false;
 			
 		if(!ctx.getRequestPermissions().isEmpty()){
 	        if(ctx.request.getRequestURI()=="$endpoint"){
 				return ctx.getRequestPermissions().contains("$endpoint");
 			}
-		}#end
+		}
+#end
 		return false;
     }
 
