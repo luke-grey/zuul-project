@@ -1,10 +1,3 @@
-##
-## This is the velocity gateway template file 
-## for the production of gateway filters for Zuul.
-## It's mostly testing right now.
-##
-## Author Luke Grey | productOps, Inc.
-## 
 package filters.pre;
 import com.netflix.zuul.ZuulFilter
 import com.netflix.zuul.ZuulFilterResult
@@ -15,14 +8,14 @@ import java.util.Map.Entry
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class ${name}SecGate extends ZuulFilter {
+class ApacheSecGate extends ZuulFilter {
 
-	private static final Logger log = LogManager.getLogger(${name}SecGate.class)
-	private static int quota = $quota;
+	private static final Logger log = LogManager.getLogger(ApacheSecGate.class)
+	private static int quota = 3;
 	
     @Override
     int filterOrder() {
-        return $order
+        return 21
     }
 
     @Override
@@ -32,7 +25,6 @@ class ${name}SecGate extends ZuulFilter {
 
     @Override
     boolean shouldFilter() {
-#if(!$disabled)
 		//if nothing in the chain has caused it to fail, and the request has permissions, 
 		//and one of those permissions are this filters endpoint,  and there are still calls left in the quota
 		//then this request should be processed by this filter
@@ -42,11 +34,11 @@ class ${name}SecGate extends ZuulFilter {
 		RequestContext ctx = RequestContext.getCurrentContext();
 		if(ctx.getContinueFiltering()){
 			if(!ctx.getRequestPermissions().isEmpty()){
-				if(ctx.request.getRequestURI()=="$endpoint"){
+				if(ctx.request.getRequestURI()=="/apache"){
 					if(quota>0){
 						log.info("Quota at " + quota)
-						if(ctx.getRequestPermissions().contains("$endpoint")){
-							log.info("Request endpoint $endpoint recognized")
+						if(ctx.getRequestPermissions().contains("/apache")){
+							log.info("Request endpoint /apache recognized")
 							return true
 						}else{
 							ctx.stopFiltering();
@@ -60,9 +52,6 @@ class ${name}SecGate extends ZuulFilter {
 					}
 				}
 			}
-#else
-		    log.info("Filter ${name}SecGate disabled.")
-#end
 	        return false;
 		}
 	}
@@ -72,12 +61,12 @@ class ${name}SecGate extends ZuulFilter {
         RequestContext ctx = RequestContext.getCurrentContext();
 		
         // sets origin
-		ctx.setRouteHost(new URL("$host"));
-		log.info("Set host to $host");
+		ctx.setRouteHost(new URL("http://apache.org/"));
+		log.info("Set host to http://apache.org/");
 		
         // sets custom uri to send to the server
-        ctx.setRequestURI("$api");
-		log.info("At $api");
+        ctx.setRequestURI("/");
+		log.info("At /");
 		
 		//drop the quota
 		quota--;

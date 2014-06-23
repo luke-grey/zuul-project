@@ -16,40 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
-## Author: Luke Grey | ProductOps, Inc.
-##
-## The type alternatives are pretty basic.
-## It's a good idea to divide this thing into
-## three different templates, or a template for each purpose:
-## gate, transform, stat return, and debug. 
-## The manager of the file just has to know what could go 
-## into each type of filter.
-## Basically, the program now needs to receive a packet, choose
-## the matching template, parse that packet's data, and write the 
-## filter.
-##
-## Still dunno how the data is being passed so, time to start a convention
-## FilterTemplates, gateway.groovy.vm, transform.groovy.vm, stat.groovy.vm, debug.groovy.vm
-## gateway:
-##	-name:()
-##  -type:()suggested pre
-##  -order:()
-##  -uri:()in form "/..."
-##  -host:()
-##  -key:()
-##  -daylimit:()
-##  -monthlimit:()
-## transform:
-##  -name:()
-##  -type:()suggested route
-##  -order:()
-##  -dont
-##  -know
-## stat:
-##	-name:()
-##  -type:()suggested post
-##  -order:()
-##  dunno
+ * Author: Luke Grey | ProductOps, Inc.
+ *
 **/
 
 public class FilterConstructor{
@@ -87,6 +55,8 @@ public class FilterConstructor{
         			context.put("endpoint", filterValues.get("endpoint"));
         			context.put("host", filterValues.get("host"));
         			context.put("api", filterValues.get("api"));
+        			context.put("quota", filterValues.get("quota"));
+        			context.put("disabled", filterValues.get("disabled"));
         			break;
         		case "key":
         			context.put("key",filterValues.get("key"));
@@ -101,7 +71,7 @@ public class FilterConstructor{
         			((String)filterValues.get("template")).substring(1);
         	
             Writer writer = new BufferedWriter(new PrintWriter(new FileOutputStream
-            ("../zuul-simple-webapp/src/main/groovy/filters/"
+            ("../../zuul-project/zuul-simple-webapp/src/main/groovy/filters/"
             +filterValues.get("type")+"/"+filterValues.get("name")+ fTemp+".groovy")));
 
             if ( template != null)
@@ -117,30 +87,42 @@ public class FilterConstructor{
     
     public static void main(String[] args){
     	HashMap<String,Object> gate=new HashMap<String,Object>();
+    	/*
     	gate.put("template", "secGate");
-    	gate.put("name", "Simple");
-    	gate.put("order", "13");
+    	gate.put("name", "Pi");
+    	gate.put("order", "20");
     	gate.put("type", "pre");
-    	gate.put("endpoint","/simple");
-    	gate.put("host","http://localhost:8081/");
-    	gate.put("api", "/SimpleAPIService");
+    	gate.put("endpoint","/pi");
+    	gate.put("host","http://54.241.52.190:9090/");
+    	gate.put("api", "/");
+    	gate.put("quota", "5");
+    	gate.put("disabled", false);
+    	*/
+    	gate.put("template", "secGate");
+    	gate.put("name", "Apache");
+    	gate.put("order", "21");
+    	gate.put("type", "pre");
+    	gate.put("endpoint","/apache");
+    	gate.put("host","http://apache.org/");
+    	gate.put("api", "/");
+    	gate.put("quota", "3");
     	gate.put("disabled", false);
     	
     	List<String> endpoints= new ArrayList<String>();
     	endpoints.add("/apache");
-    	endpoints.add("/pi");
-    	endpoints.add("/simple");
     	
     	HashMap<String,Object> keyFilter=new HashMap<String,Object>();
     	keyFilter.put("template","key");
-    	keyFilter.put("name", "Inc01");
-    	keyFilter.put("order","3");
+    	keyFilter.put("name", "ApacheRefer");
+    	keyFilter.put("order","5");
     	keyFilter.put("type", "pre");
+    	
     	keyFilter.put("key","1234567890");
     	keyFilter.put("endpoints",endpoints);
     	keyFilter.put("disabled",false);
+    	
     	@SuppressWarnings("unused")
-		FilterConstructor t = new FilterConstructor(keyFilter);
+		FilterConstructor t = new FilterConstructor(gate);
     }
     
 }

@@ -20,10 +20,15 @@ import com.netflix.zuul.ZuulFilterResult
 import com.netflix.zuul.context.RequestContext
 import com.netflix.zuul.context.Debug
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * @author Luke Grey | productOps, Inc.
  */
 class PreKeyFilter extends ZuulFilter {
+	
+	private static final Logger log = LogManager.getLogger(PreKeyFilter.class)
 
     @Override
     int filterOrder() {
@@ -44,8 +49,11 @@ class PreKeyFilter extends ZuulFilter {
     Object run() {
 		RequestContext ctx = RequestContext.getCurrentContext();
 		String k = ctx.getZuulRequestHeaders().get("key");
-		if(k==null)
+		if(k==null){
 			ctx.stopFiltering();
+			ctx.setErrorCondition("lack of key");
+			log.error("No key, man");
+		}
 		else{
 			ctx.setPermissionKey(k);
 		}

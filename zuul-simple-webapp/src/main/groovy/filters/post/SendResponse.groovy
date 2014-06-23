@@ -24,11 +24,16 @@ import com.netflix.zuul.constants.ZuulHeaders
 import com.netflix.zuul.context.Debug
 import com.netflix.zuul.context.RequestContext
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.zip.GZIPInputStream
 import javax.servlet.http.HttpServletResponse
 
 class SendResponseFilter extends ZuulFilter {
-
+	
+	private static final Logger log = LogManager.getLogger(SendResponseFilter.class)
+	
     static DynamicBooleanProperty INCLUDE_DEBUG_HEADER =
         DynamicPropertyFactory.getInstance().getBooleanProperty(ZuulConstants.ZUUL_INCLUDE_DEBUG_HEADER, false);
 
@@ -160,9 +165,11 @@ class SendResponseFilter extends ZuulFilter {
         if (INCLUDE_DEBUG_HEADER.get()) servletResponse.addHeader("X-Zuul-Debug-Header", debugHeader)
 
         if (Debug.debugRequest()) {
+			log.info("Outbound::");
             zuulResponseHeaders?.each { Pair<String, String> it ->
                 servletResponse.addHeader(it.first(), it.second())
                 Debug.addRequestDebug("OUTBOUND: <  " + it.first() + ":" + it.second())
+				log.info("Headers<  " + it.first() + ":" + it.second());
             }
         } else {
             zuulResponseHeaders?.each { Pair<String, String> it ->

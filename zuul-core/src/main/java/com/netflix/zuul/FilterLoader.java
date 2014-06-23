@@ -20,8 +20,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +55,7 @@ import static org.mockito.Mockito.when;
 public class FilterLoader {
     final static FilterLoader INSTANCE = new FilterLoader();
 
-    private static final Logger LOG = LoggerFactory.getLogger(FilterLoader.class);
+    private static final Logger LOG = LogManager.getLogger(FilterLoader.class);
 
     private final ConcurrentHashMap<String, Long> filterClassLastModified = new ConcurrentHashMap<String, Long>();
     private final ConcurrentHashMap<String, String> filterClassCode = new ConcurrentHashMap<String, String>();
@@ -146,7 +149,7 @@ public class FilterLoader {
     public boolean putFilter(File file) throws Exception {
         String sName = file.getAbsolutePath() + file.getName();
         if (filterClassLastModified.get(sName) != null && (file.lastModified() != filterClassLastModified.get(sName))) {
-            LOG.debug("reloading filter " + sName);
+            LOG.debug("reloading filter " + file.getName());
             filterRegistry.remove(sName);
         }
         ZuulFilter filter = filterRegistry.get(sName);

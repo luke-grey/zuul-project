@@ -37,8 +37,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import com.netflix.util.Pair;
 import com.netflix.zuul.constants.ZuulHeaders;
@@ -57,7 +61,7 @@ import com.netflix.zuul.util.DeepCopy;
 @SuppressWarnings("serial")
 public class RequestContext extends ConcurrentHashMap<String, Object> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RequestContext.class);
+    private static final Logger LOG = LogManager.getLogger(RequestContext.class);
 
     protected static Class<? extends RequestContext> contextClass = RequestContext.class;
 
@@ -405,6 +409,29 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
     }
     
     /**
+     * Sets the error condition
+     * 
+     * @param key
+     * 
+     */
+    public void setErrorCondition(String key){
+    	set("errorCondition",key);
+    }
+    
+    /**
+     * Returns the Error Condition for this request
+     * 
+     * @return String
+     * 
+     */
+    public String getErrorCondition(){
+    	if (get("errorCondition") == null) {
+    		putIfAbsent("errorCondition","");
+    	}
+    	return (String) get("errorCondition");
+    }
+    
+    /**
      * Determines if this request should continueFiltering. defaults to true.
      * 
      * @return boolean
@@ -465,7 +492,7 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
     /**
      * Returns the key for this request
      * 
-     * @return boolean
+     * @return String
      * 
      */
     public String getPermissionKey(){

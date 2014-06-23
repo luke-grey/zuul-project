@@ -1,10 +1,3 @@
-## This filter should check a request's header for keys
-## then, through the context, give that request certain
-## permissions. 
-## These need a 10-char key, api information
-## 
-## Author Luke Grey | productOps, Inc.
-## 
 package filters.pre;
 import com.netflix.zuul.ZuulFilter
 import com.netflix.zuul.ZuulFilterResult
@@ -14,13 +7,13 @@ import com.netflix.zuul.context.Debug
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class ${name}Key extends ZuulFilter {
+class Inc01Key extends ZuulFilter {
 
-	private static final Logger log = LogManager.getLogger(${name}Key.class);
+	private static final Logger log = LogManager.getLogger(Inc01Key.class);
 	
     @Override
     int filterOrder() {
-        return $order
+        return 3
     }
 
     @Override
@@ -30,30 +23,28 @@ class ${name}Key extends ZuulFilter {
 
     @Override
     boolean shouldFilter() {
-#if(!$disabled)
 		RequestContext ctx = RequestContext.getCurrentContext()
 		
 		if(ctx.getContinueFiltering()){
 			if(ctx.getHasKey()){
-				if(ctx.getPermissionKey()=="$key"){
-					log.info("Request key $key recognized")
+				if(ctx.getPermissionKey()=="1234567890"){
+					log.info("Request key 1234567890 recognized")
 					return true;
 				}
 			}
 		}
-#else
-		log.info("Filter ${name}Key disabled.")
-#end
 		return false;
     }
 
     @Override
     Object run() {
         RequestContext ctx = RequestContext.getCurrentContext();
-#foreach($endpoint in $endpoints)
-		ctx.addRequestPermission("$endpoint")
-		log.info("Added permission for $endpoint");
-#end
+		//ctx.addRequestPermission("/apache")
+		//log.info("Added permission for /apache");
+		ctx.addRequestPermission("/pi")
+		log.info("Added permission for /pi");
+		ctx.addRequestPermission("/simple")
+		log.info("Added permission for /simple");
     }
 
 }

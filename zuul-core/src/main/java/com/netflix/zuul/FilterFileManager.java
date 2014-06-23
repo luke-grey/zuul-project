@@ -21,8 +21,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -46,7 +50,7 @@ import static org.mockito.Mockito.*;
  */
 public class FilterFileManager {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FilterFileManager.class);
+    private static final Logger LOG = LogManager.getLogger(FilterFileManager.class);
 
     String[] aDirectories;
     int pollingIntervalSeconds;

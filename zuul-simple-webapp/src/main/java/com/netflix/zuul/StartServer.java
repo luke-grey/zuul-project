@@ -21,8 +21,11 @@ import java.io.File;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.filters.FilterRegistry;
@@ -32,7 +35,7 @@ import com.netflix.zuul.monitoring.MonitoringHelper;
 
 public class StartServer implements ServletContextListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(StartServer.class);
+	 private static final Logger logger = LogManager.getLogger(StartServer.class);
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -66,9 +69,10 @@ public class StartServer implements ServletContextListener {
         }
     }
 
-    private void initJavaFilters() {
+    @SuppressWarnings("unused")
+	private void initJavaFilters() {
         final FilterRegistry r = FilterRegistry.instance();
-
+        /*
         r.put("javaPreFilter", new ZuulFilter() {
             @Override
             public int filterOrder() {
@@ -116,6 +120,7 @@ public class StartServer implements ServletContextListener {
                 return null;
             }
         });
+        */
     }
 
 }

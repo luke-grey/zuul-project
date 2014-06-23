@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" verbose="true" >
+
+  <Appenders>
+    <File name="MyAppender" fileName="zuulSimple.log" append="true" >
+      <PatternLayout>
+        <Pattern>%d %p %c{1.} || %m %ex%n</Pattern>
+      </PatternLayout>
+    </File>
+    <Console name="STDOUT" target="SYSTEM_OUT">
+      <PatternLayout pattern="%m%n"/>
+    </Console>
+  </Appenders>
+  
+  <Loggers>
+    <Root level="DEBUG">
+      <AppenderRef ref="MyAppender" level="DEBUG"/>
+      <AppenderRef ref="STDOUT" level="INFO"/>
+    </Root>
+    <Logger name="com.netflix.zuul.*" level="DEBUG">
+    	<AppenderRef ref="MyAppender"/>
+    </Logger>
+  </Loggers>
+</Configuration>

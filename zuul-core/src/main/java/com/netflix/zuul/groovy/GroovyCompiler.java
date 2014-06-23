@@ -22,8 +22,12 @@ import groovy.lang.GroovyObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +44,7 @@ import static org.mockito.Mockito.spy;
  */
 public class GroovyCompiler implements DynamicCodeCompiler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GroovyCompiler.class);
+    private static final Logger LOG = LogManager.getLogger(GroovyCompiler.class);
 
     /**
      * Compiles Groovy code and returns the Class of the compiles code.

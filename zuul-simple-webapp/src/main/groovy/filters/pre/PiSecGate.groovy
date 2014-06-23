@@ -1,10 +1,3 @@
-##
-## This is the velocity gateway template file 
-## for the production of gateway filters for Zuul.
-## It's mostly testing right now.
-##
-## Author Luke Grey | productOps, Inc.
-## 
 package filters.pre;
 import com.netflix.zuul.ZuulFilter
 import com.netflix.zuul.ZuulFilterResult
@@ -15,38 +8,37 @@ import java.util.Map.Entry
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class ${name}SecGate extends ZuulFilter {
+class PiSecGate extends ZuulFilter {
 
-	private static final Logger log = LogManager.getLogger(${name}SecGate.class)
-	private static int quota = $quota;
-	
-    @Override
-    int filterOrder() {
-        return $order
-    }
+	private static final Logger log = LogManager.getLogger(PiSecGate.class)
+	private static int quota = 5;
 
-    @Override
-    String filterType() {
-        return "pre"
-    }
+	@Override
+	int filterOrder() {
+		return 20
+	}
 
-    @Override
-    boolean shouldFilter() {
-#if(!$disabled)
-		//if nothing in the chain has caused it to fail, and the request has permissions, 
+	@Override
+	String filterType() {
+		return "pre"
+	}
+
+	@Override
+	boolean shouldFilter() {
+		//if nothing in the chain has caused it to fail, and the request has permissions,
 		//and one of those permissions are this filters endpoint,  and there are still calls left in the quota
 		//then this request should be processed by this filter
 		//however if this call doesnt have permission to use this, stop filtering
 		//and if there is nothing left in the quota, stop filtering too
-		
+
 		RequestContext ctx = RequestContext.getCurrentContext();
 		if(ctx.getContinueFiltering()){
 			if(!ctx.getRequestPermissions().isEmpty()){
-				if(ctx.request.getRequestURI()=="$endpoint"){
+				if(ctx.request.getRequestURI()=="/pi"){
 					if(quota>0){
 						log.info("Quota at " + quota)
-						if(ctx.getRequestPermissions().contains("$endpoint")){
-							log.info("Request endpoint $endpoint recognized")
+						if(ctx.getRequestPermissions().contains("/pi")){
+							log.info("Request endpoint /pi recognized")
 							return true
 						}else{
 							ctx.stopFiltering();
@@ -60,29 +52,26 @@ class ${name}SecGate extends ZuulFilter {
 					}
 				}
 			}
-#else
-		    log.info("Filter ${name}SecGate disabled.")
-#end
-	        return false;
+			return false;
 		}
 	}
 
-    @Override
-    Object run() {
-        RequestContext ctx = RequestContext.getCurrentContext();
-		
-        // sets origin
-		ctx.setRouteHost(new URL("$host"));
-		log.info("Set host to $host");
-		
-        // sets custom uri to send to the server
-        ctx.setRequestURI("$api");
-		log.info("At $api");
-		
+	@Override
+	Object run() {
+		RequestContext ctx = RequestContext.getCurrentContext();
+
+		// sets origin
+		ctx.setRouteHost(new URL("http://54.241.52.190:9090/"));
+		log.info("Set host to http://54.241.52.190:9090/");
+
+		// sets custom uri to send to the server
+		ctx.setRequestURI("/");
+		log.info("At /");
+
 		//drop the quota
 		quota--;
 		log.info("Quota is now "+quota);
-    }
+	}
 
 }
 

@@ -14,39 +14,50 @@
  *      limitations under the License.
  */
 package filters.pre;
-
 import com.netflix.zuul.Config
 import com.netflix.zuul.ZuulFilter
 import com.netflix.zuul.ZuulFilterResult
 import com.netflix.zuul.context.RequestContext
 import com.netflix.zuul.context.Debug
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
- * Author: Luke Grey | productOps, Inc.
+ * @author Luke Grey | productOps, Inc.
  */
+class PostGateFilter extends ZuulFilter {
 
-class KeyAdderFilter extends ZuulFilter {
+	private static final Logger log = LogManager.getLogger(PostGateFilter.class)
 
-    @Override
-    int filterOrder() {
-        return 2
-    }
+	@Override
+	int filterOrder() {
+		return 200
+	}
 
-    @Override
-    String filterType() {
-        return "pre"
-    }
+	@Override
+	String filterType() {
+		return "pre"
+	}
 
-    @Override
-    boolean shouldFilter() {
-		return true;
-    }
-
-    @Override
-    Object run() {
+	@Override
+	boolean shouldFilter() {
 		RequestContext ctx = RequestContext.getCurrentContext();
-		ctx.addZuulRequestHeader("key","1234567890");
-		//Debug.addRequestDebug("GREY::"+ctx.request.getRequestURI())
-    }
+		if(ctx.getContinueFiltering()){
+			return ctx.getRouteHost()==null;
+		}
+		return false
+	}
 
+	@Override
+	Object run() {
+		RequestContext ctx = RequestContext.getCurrentContext();
+		if(ctx.getContinueFiltering()){
+			if(ctx.getHasKey()){
+				ctx.stopFiltering();
+				ctx.setErrorCondition("lack of acceptable gateway");
+				log.error("No key, man");
+			}
+		}
+	}
 }
