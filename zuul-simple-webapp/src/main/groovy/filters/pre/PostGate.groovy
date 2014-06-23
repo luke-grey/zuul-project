@@ -56,7 +56,7 @@ class PostGateFilter extends ZuulFilter {
 			if(ctx.getHasKey()){
 				ctx.stopFiltering();
 				ctx.setErrorCondition("lack of acceptable gateway");
-				log.error("No key, man");
+				log.error("Bad Gateway");
 			}
 		}
 	}
