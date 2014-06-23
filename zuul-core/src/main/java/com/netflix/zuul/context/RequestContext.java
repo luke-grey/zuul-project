@@ -409,7 +409,9 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
     }
     
     /**
-     * Sets the error condition
+     * Used in conjuntion with stopFiltering to pass an error message to RejectionResponse.
+     * At the moment, passes it into the sentence,
+     * "Your request has been refused due to _______."
      * 
      * @param key
      * 
@@ -419,7 +421,7 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
     }
     
     /**
-     * Returns the Error Condition for this request
+     * Used to retrieve the condition that caused error for rejection response
      * 
      * @return String
      * 
@@ -432,7 +434,8 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
     }
     
     /**
-     * Determines if this request should continueFiltering. defaults to true.
+     * Returns the value of a flag used to skip past the remaining filters 
+     * in case of a failing situation. 
      * 
      * @return boolean
      * 
@@ -445,7 +448,9 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
     }
     
     /**
-     * Sets the continueFiltering Attribute to false
+     * Used to indicate a failing situation. 
+     * Skips over the remaining keys and gates
+     * Runs RejectionResponse
      * 
      */
     public void stopFiltering(){
@@ -480,7 +485,7 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
     }
     
     /**
-     * Adds a new key to a request
+     * Adds a new key to the context
      * 
      * @param key
      * 
@@ -490,7 +495,7 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
     }
 
     /**
-     * Returns the key for this request
+     * Returns the key for this context
      * 
      * @return String
      * 
@@ -503,7 +508,7 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
     }
     
     /**
-     * Adds a key permission to a request
+     * Adds permission for an endpoint
      * 
      * @param key
      * @param value
