@@ -244,6 +244,7 @@ class SimpleHostRoutingFilter extends ZuulFilter {
         try {
             httpRequest.setHeaders(headers)
             HttpResponse zuulResponse = forwardRequest(httpclient, httpHost, httpRequest)
+			RequestContext.currentContext.stopRTTTimer();
             return zuulResponse
         } finally {
             // When HttpClient instance is no longer needed,
@@ -255,6 +256,7 @@ class SimpleHostRoutingFilter extends ZuulFilter {
     }
 
     HttpResponse forwardRequest(HttpClient httpclient, HttpHost httpHost, HttpRequest httpRequest) {
+		RequestContext.currentContext.startRTTTimer();
         return httpclient.execute(httpHost, httpRequest);
     }
 
@@ -361,7 +363,7 @@ class SimpleHostRoutingFilter extends ZuulFilter {
                 if (isValidHeader(header)) {
                     RequestContext.getCurrentContext().addZuulResponseHeader(header.name, header.value);
                     Debug.addRequestDebug("ORIGIN_RESPONSE:: < ${header.name}, ${header.value}")
-					LOG.info("header< ${header.name}, ${header.value}")
+											LOG.info("Headers< ${header.name}, ${header.value}")
                 }
             }
 

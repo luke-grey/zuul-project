@@ -4,7 +4,12 @@
   <Appenders>
     <File name="MyAppender" fileName="zuulSimple.log" append="true" >
       <PatternLayout>
-        <Pattern>%d %p %c{1.} || %m %ex%n</Pattern>
+        <Pattern>%d %level{DEBUG=DBUG, WARN=WARN, ERROR=ERRR, TRACE=TRCE, INFO=INFO} %c{1.} [%t] %m %ex%n </Pattern>
+      </PatternLayout>
+    </File>
+    <File name="TDRAppender" fileName="TDR.log" append="true" >
+      <PatternLayout>
+        <Pattern> %m %ex%n </Pattern>
       </PatternLayout>
     </File>
     <Console name="STDOUT" target="SYSTEM_OUT">
@@ -19,6 +24,9 @@
     </Root>
     <Logger name="com.netflix.zuul.*" level="DEBUG">
     	<AppenderRef ref="MyAppender"/>
+    </Logger>
+    <Logger name="filters.post.TDRPoster" level="INFO">
+    	<AppenderRef ref="TDRAppender"/>
     </Logger>
   </Loggers>
 </Configuration>

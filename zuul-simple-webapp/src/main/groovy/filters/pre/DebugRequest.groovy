@@ -43,7 +43,7 @@ class DebugRequest extends ZuulFilter {
 
     @Override
     int filterOrder() {
-        return 10000
+        return 2
     }
 
     @Override

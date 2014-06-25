@@ -62,13 +62,9 @@ class RejectionResponse extends ZuulFilter {
 		log.info("Running 404 page");
 		//there should be different resposes for different failures of this system
 		//for instance this one works when there's no key
+		context.setResponseStatusCode(404)
 		context.setResponseBody("<html><body><h1>Your request has been refused due to "+context.getErrorCondition()+".</h1>"+
 												"Apologies, please try again with better luck. Thanks.</body></html>")
-		//there should also be one for an unrecognized key,
-		
-		//one for an unrecognized endpoint
-		
-		//and one for... whateverelse
     }
 
 }

@@ -24,11 +24,15 @@ import java.io.NotSerializableException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,12 +41,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
+
+
+
+
+
 
 import com.netflix.util.Pair;
 import com.netflix.zuul.constants.ZuulHeaders;
@@ -533,6 +541,56 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
         }
     	return (ArrayList<String>) get("requestPermissions");
     }
+    
+    /**
+     * Gets the non-URI/version part of the request's URI.
+     * For example: 
+     * 	
+     * 			 /apache/v1  ->  ""
+     *      /pi/v1/src/main  ->  "/src/main"
+     *  /e/v1.6/very/simple  ->  "/very/simple"
+     *    /SimpleAPIService  ->  ""
+     *     /src/path/folder  ->  "/path/folder"
+     *     
+     * @return String
+     */
+    public String getNonURIPath(){
+    	if(get("nonURIPath")==null){
+    		String uri=getRequest().getRequestURI();
+    		String nonURIPath="";
+    		int n = getURIVersionPath().length();
+    		if(uri.substring(n)!=null)
+    			nonURIPath=uri.substring(n);
+    		putIfAbsent("nonURIPath",nonURIPath);
+    	}
+    	return (String) get("nonURIPath");
+    }
+    
+    /**
+     * Gets the URI/version part of the request.
+     * For example: 
+     * 	
+     * 			 /apache/v1  ->  "/apache/v1"
+     *      /pi/v1/src/main  ->  "/pi/v1"
+     *  /e/v1.6/very/simple  ->  "/e/v1.6"
+     *    /SimpleAPIService  ->  "/SimpleAPIService"
+     *     /src/path/folder  ->  "/src"
+     *     
+     * @return String
+     */
+    public String getURIVersionPath(){
+    	if(get("URIVersionPath")==null){
+    		String uri=getRequest().getRequestURI();
+    		Pattern endpointWithVersion= Pattern.compile("/[A-Za-z]*(/v[0-9]*(\\.[0-9]*)*)?");
+    		String URIVersionPath="";
+    		Matcher m = endpointWithVersion.matcher(uri);
+    		m.find();
+    		if(uri.substring(m.start(),m.end())!=null)
+    			URIVersionPath=uri.substring(m.start(),m.end());
+    		putIfAbsent("URIVersionPath",URIVersionPath);
+    	}
+    	return (String) get("URIVersionPath");
+    }
 
     /**
      * get the URI outside the request object.
@@ -553,6 +611,67 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
      */
     public void setRequestURI(String uri){
     	set("requestURI",uri);
+    }
+    
+    /**
+     * Captures the time the inbound request entered Zuul
+     *
+     */
+    public void beginTimer(){
+    	set("beginTime",Calendar.getInstance().getTime());
+    }
+    
+    /**
+     * Returns the time the inbound request entered Zuul
+     *
+     * @return beginTime
+     */
+    public Date getBeginTime(){
+    	return (Date) get("beginTime");
+    }
+    
+    /**
+     * Captures the time the outbound response left Zuul
+     *
+     */
+    public void endTimer(){
+    	set("endTime",Calendar.getInstance().getTime());
+    }
+    
+    /**
+     * Returns the time the outbound response left Zuul
+     *
+     * @return endTime
+     */
+    public Date getEndTime(){
+    	return (Date) get("endTime");
+    }
+    
+    /**
+     * Starts a timer used for TDR
+     *
+     */
+    public void startRTTTimer(){
+    	set("startRTTime",System.currentTimeMillis());
+    }
+    
+    /**
+     * Sets the end time for a timer used for TDR
+     *
+     */
+    public void stopRTTTimer(){
+    	set("stopRTTime",System.currentTimeMillis());
+    }
+    
+    /**
+     * Returns the difference in stop and start RTTTimers
+     *
+     * @return roundTripTime
+     */
+    public long getRTTTimer(){
+    	if(get("startRTTime")==null||get("stopRTTime")==null)
+    		return 0;
+    	return (long) get("stopRTTime") -(long)get("startRTTime");
     }
 
     /**

@@ -53,8 +53,9 @@ public class FilterConstructor{
         	switch((String) filterValues.get("template")){
         		case "secGate":
         			context.put("endpoint", filterValues.get("endpoint"));
-        			context.put("host", filterValues.get("host"));
+        			context.put("hosts", filterValues.get("hosts"));
         			context.put("api", filterValues.get("api"));
+        			context.put("version", filterValues.get("version"));
         			context.put("quota", filterValues.get("quota"));
         			context.put("disabled", filterValues.get("disabled"));
         			break;
@@ -72,7 +73,7 @@ public class FilterConstructor{
         	
             Writer writer = new BufferedWriter(new PrintWriter(new FileOutputStream
             ("../../zuul-project/zuul-simple-webapp/src/main/groovy/filters/"
-            +filterValues.get("type")+"/"+filterValues.get("name")+ fTemp+".groovy")));
+            +filterValues.get("type")+"/"+filterValues.get("name")+ fTemp +".groovy")));
 
             if ( template != null)
                     template.merge(context, writer);
@@ -87,36 +88,65 @@ public class FilterConstructor{
     
     public static void main(String[] args){
     	HashMap<String,Object> gate=new HashMap<String,Object>();
-    	/*
+    	
+    	List<String> hosts= new ArrayList<String>();
+    	hosts.add("http://54.241.52.190:9090/");
+    	hosts.add("http://54.241.52.190:9091/");
+    		
+
     	gate.put("template", "secGate");
     	gate.put("name", "Pi");
     	gate.put("order", "20");
     	gate.put("type", "pre");
     	gate.put("endpoint","/pi");
-    	gate.put("host","http://54.241.52.190:9090/");
-    	gate.put("api", "/");
+    	gate.put("hosts",hosts);
+    	gate.put("api", "");
+    	gate.put("version", "2");
     	gate.put("quota", "5");
     	gate.put("disabled", false);
-    	*/
-    	gate.put("template", "secGate");
-    	gate.put("name", "Apache");
-    	gate.put("order", "21");
-    	gate.put("type", "pre");
-    	gate.put("endpoint","/apache");
-    	gate.put("host","http://apache.org/");
-    	gate.put("api", "/");
-    	gate.put("quota", "3");
-    	gate.put("disabled", false);
+    	gate.put("trafficLimit","5");
+   
+//    	List<String> hosts= new ArrayList<String>();
+//    	hosts.add("http://apache.org/");
+//    	
+//    	gate.put("template", "secGate");
+//    	gate.put("name", "Apache");
+//    	gate.put("order", "21");
+//    	gate.put("type", "pre");
+//    	gate.put("endpoint","/apache");
+//    	gate.put("hosts","hosts");
+//    	gate.put("api", "");
+//    	gate.put("version", "1");
+//    	gate.put("quota", "3");
+//    	gate.put("disabled", false);
+//    	gate.put("trafficLimit","5");
+//    
+//    	List<String> hosts= new ArrayList<String>();
+//    	hosts.add("http://localhost:8081/");
+//    	
+//    	gate.put("template", "secGate");
+//    	gate.put("name", "Simple");
+//    	gate.put("order", "22");
+//    	gate.put("type", "pre");
+//    	gate.put("endpoint","/simple");
+//    	gate.put("hosts","hosts");
+//    	gate.put("api", "");
+//    	gate.put("version", "1");
+//    	gate.put("quota", "5");
+//    	gate.put("disabled", false);
+//    	gate.put("trafficLimit","5");
+    	
     	
     	List<String> endpoints= new ArrayList<String>();
-    	endpoints.add("/apache");
+    	endpoints.add("/apache/v1");
+    	endpoints.add("/pi/v1");
+    	
     	
     	HashMap<String,Object> keyFilter=new HashMap<String,Object>();
     	keyFilter.put("template","key");
-    	keyFilter.put("name", "ApacheRefer");
-    	keyFilter.put("order","5");
+    	keyFilter.put("name", "Inc01");
+    	keyFilter.put("order","10");
     	keyFilter.put("type", "pre");
-    	
     	keyFilter.put("key","1234567890");
     	keyFilter.put("endpoints",endpoints);
     	keyFilter.put("disabled",false);

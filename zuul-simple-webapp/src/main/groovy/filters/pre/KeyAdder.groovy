@@ -29,7 +29,7 @@ class KeyAdderFilter extends ZuulFilter {
 
     @Override
     int filterOrder() {
-        return 2
+        return 3
     }
 
     @Override

@@ -5,6 +5,16 @@
 ##
 ## Author Luke Grey | productOps, Inc.
 ## 
+/**
+ * Author: Luke Grey | productOps, Inc.
+ *
+ * if nothing in the chain has caused it to fail, and the request has permissions,
+ * and one of those permissions are this filters endpoint,  and there are still calls left in the quota
+ * then this request should be processed by this filter
+ * however if this call doesnt have permission to use this, stop filtering
+ * and if there is nothing left in the quota, stop filtering too
+ * 
+ */
 package filters.pre;
 import com.netflix.zuul.ZuulFilter
 import com.netflix.zuul.ZuulFilterResult
@@ -15,10 +25,13 @@ import java.util.Map.Entry
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class ${name}SecGate extends ZuulFilter {
+class ${name}SecGateV${version} extends ZuulFilter {
 
-	private static final Logger log = LogManager.getLogger(${name}SecGate.class)
+	private static final Logger log = LogManager.getLogger(${name}SecGateV${version}.class)
 	private static int quota = $quota;
+	private static long hostNum = 1;
+	private static int traffic = 0;
+	private static long lastTimeReset;
 	
     @Override
     int filterOrder() {
@@ -33,30 +46,30 @@ class ${name}SecGate extends ZuulFilter {
     @Override
     boolean shouldFilter() {
 #if(!$disabled)
-		//if nothing in the chain has caused it to fail, and the request has permissions, 
-		//and one of those permissions are this filters endpoint,  and there are still calls left in the quota
-		//then this request should be processed by this filter
-		//however if this call doesnt have permission to use this, stop filtering
-		//and if there is nothing left in the quota, stop filtering too
-		
 		RequestContext ctx = RequestContext.getCurrentContext();
 		if(ctx.getContinueFiltering()){
 			if(!ctx.getRequestPermissions().isEmpty()){
-				if(ctx.request.getRequestURI()=="$endpoint"){
-					if(quota>0){
+				if(ctx.getURIVersionPath()=="$endpoint/v$version")	
+					if(trafficPassage()){
 						log.info("Quota at " + quota)
-						if(ctx.getRequestPermissions().contains("$endpoint")){
-							log.info("Request endpoint $endpoint recognized")
-							return true
-						}else{
+						if(quota>0){
+							if(ctx.getRequestPermissions().contains("$endpoint/v$version")){
+								log.info("Request endpoint $endpoint/v$version recognized")
+								return true
+							}else{
+								ctx.stopFiltering();
+								log.error("No permissions for this endpoint")
+								ctx.setErrorCondition("lack of permission on this endpoint");
+							}
+						}else if(quota<1){
 							ctx.stopFiltering();
-							log.error("No permissions for this endpoint")
-							ctx.setErrorCondition("lack of permission on this endpoint");
+							log.error("Empty quota.")
+							ctx.setErrorCondition("being out of passes");
 						}
-					}else if(quota<1){
+					}else{
 						ctx.stopFiltering();
-						log.error("Empty quota.")
-						ctx.setErrorCondition("being out of passes");
+						log.error("Traffic overflow.")
+						ctx.setErrorCondition("too much traffic. Slow down, cowboy");
 					}
 				}
 			}
@@ -72,18 +85,56 @@ class ${name}SecGate extends ZuulFilter {
         RequestContext ctx = RequestContext.getCurrentContext();
 		
         // sets origin
+#if(${hosts.size}==1)
+#foreach($host in $hosts)
 		ctx.setRouteHost(new URL("$host"));
 		log.info("Set host to $host");
-		
+#end
+#else
+		switch((hostnNum%${hosts.size()})+1){
+#foreach($host in $hosts)
+			case $velocityCount:
+				ctx.setRouteHost(new URL("$host"));
+				log.info("Set host to $host");
+			break;
+#end
+			default:
+				log.error("No host chosen");
+			break;
+		}
+#end
         // sets custom uri to send to the server
-        ctx.setRequestURI("$api");
-		log.info("At $api");
+        ctx.setRequestURI("$api"+ctx.getNonURIPath());
+		log.info("At $api"+ctx.getNonURIPath());
 		
 		//drop the quota
 		quota--;
 		log.info("Quota is now "+quota);
+		
+		hostNum++;
+		log.info("Traffic at"+traffic)
+		traffic++;
+		
     }
-
+	
+	private boolean trafficPassage(){
+		//update the traffic based on the current time and the last time it updated the traffic
+		if(lastTimeDecremented!=null){
+			int dec = (int)(Math.round((System.currentTimeMillis()-lastTimeDecremented))/1000)
+			log.info("Traffic reduced by: "+dec);
+			if(dec>0){
+				traffic-=dec
+				lastTimeDecremented=System.currentTimeMillis()
+				if(traffic<0)
+					traffic=0;
+			}
+		}else{
+			lastTimeDecremented=System.currentTimeMillis()
+		}
+		//check if the traffic is passing
+		log.info("Traffic at " + traffic)
+		return traffic<$trafficLimit;
+	}
 }
 
 

@@ -13,52 +13,45 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-package filters.pre;
-import com.netflix.zuul.Config
+package filters.pre
+
+import com.netflix.zuul.StartServer;
 import com.netflix.zuul.ZuulFilter
-import com.netflix.zuul.ZuulFilterResult
+import com.netflix.zuul.context.Debug;
 import com.netflix.zuul.context.RequestContext
-import com.netflix.zuul.context.Debug
+import com.netflix.util.Pair
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * @author Luke Grey | productOps, Inc.
+ * @author Mikey Cohen
+ * Date: 2/3/12
+ * Time: 2:48 PM
  */
-class PreKeyFilter extends ZuulFilter {
+class TDRPreTimer extends ZuulFilter {
 	
-	private static final Logger log = LogManager.getLogger(PreKeyFilter.class)
-
-    @Override
-    int filterOrder() {
-        return 4 
-    }
-
+	private static final Logger log = LogManager.getLogger(TDRPreTimer.class);
+	
     @Override
     String filterType() {
         return "pre"
     }
 
     @Override
+    int filterOrder() {
+        return 1
+    }
+
+    @Override
     boolean shouldFilter() {
-		return true;
+		return true
     }
 
     @Override
     Object run() {
-		RequestContext ctx = RequestContext.getCurrentContext();
-		String k = ctx.getZuulRequestHeaders().get("key");
-		if(k==null){
-			ctx.stopFiltering();
-			ctx.setErrorCondition("lack of key");
-			log.error("Request is without key header");
-		}
-		else{
-			ctx.setPermissionKey(k);
-		}
-		ctx.setHasKey(k!=null);
-		
+		RequestContext.getCurrentContext().beginTimer();
+		log.info("Began timer");
     }
 
 }
