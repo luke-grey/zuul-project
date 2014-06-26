@@ -8,14 +8,14 @@ import java.util.Map.Entry
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class ApacheSecGate extends ZuulFilter {
+class SimpleSecGateV1 extends ZuulFilter {
 
-	private static final Logger log = LogManager.getLogger(ApacheSecGate.class)
-	private static int quota = 3;
+	private static final Logger log = LogManager.getLogger(SimpleSecGateV1.class)
+	private static int quota = 5;
 	
     @Override
     int filterOrder() {
-        return 21
+        return 22
     }
 
     @Override
@@ -34,11 +34,11 @@ class ApacheSecGate extends ZuulFilter {
 		RequestContext ctx = RequestContext.getCurrentContext();
 		if(ctx.getContinueFiltering()){
 			if(!ctx.getRequestPermissions().isEmpty()){
-				if(ctx.getURIVersionPath()=="/apache"){
+				if(ctx.request.getRequestURI().startsWith("/simple/v1")){
 					if(quota>0){
 						log.info("Quota at " + quota)
-						if(ctx.getRequestPermissions().contains("/apache")){
-							log.info("Request endpoint /apache recognized")
+						if(ctx.getRequestPermissions().contains("/simple/v1")){
+							log.info("Request endpoint /simple/v1 recognized")
 							return true
 						}else{
 							ctx.stopFiltering();
@@ -61,12 +61,12 @@ class ApacheSecGate extends ZuulFilter {
         RequestContext ctx = RequestContext.getCurrentContext();
 		
         // sets origin
-		ctx.setRouteHost(new URL("http://apache.org/"));
-		log.info("Set host to http://apache.org/");
+		ctx.setRouteHost(new URL("http://localhost:8081/"));
+		log.info("Set host to http://localhost:8081/");
 		
         // sets custom uri to send to the server
-        ctx.setRequestURI("/");
-		log.info("At /");
+        ctx.setRequestURI(""+ctx.getNonURIPath());
+		log.info("At "+ctx.getNonURIPath());
 		
 		//drop the quota
 		quota--;

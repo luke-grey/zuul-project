@@ -13,7 +13,7 @@ class Inc01Key extends ZuulFilter {
 	
     @Override
     int filterOrder() {
-        return 3
+        return 10
     }
 
     @Override
@@ -39,12 +39,10 @@ class Inc01Key extends ZuulFilter {
     @Override
     Object run() {
         RequestContext ctx = RequestContext.getCurrentContext();
-		//ctx.addRequestPermission("/apache")
-		//log.info("Added permission for /apache");
-		ctx.addRequestPermission("/pi")
-		log.info("Added permission for /pi");
-		ctx.addRequestPermission("/simple")
-		log.info("Added permission for /simple");
+		ctx.addRequestPermission("/pi/v2")
+		log.info("Added permission for /pi/v2");
+		ctx.addRequestPermission("/simple/v1")
+		log.info("Added permission for /simple/v1");
     }
 
 }

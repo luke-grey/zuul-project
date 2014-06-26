@@ -1,18 +1,18 @@
 /*
- * Copyright 2013 Netflix, Inc.
- *
- *      Licensed under the Apache License, Version 2.0 (the "License");
- *      you may not use this file except in compliance with the License.
- *      You may obtain a copy of the License at
- *
- *          http://www.apache.org/licenses/LICENSE-2.0
- *
- *      Unless required by applicable law or agreed to in writing, software
- *      distributed under the License is distributed on an "AS IS" BASIS,
- *      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *      See the License for the specific language governing permissions and
- *      limitations under the License.
- */
+* Copyright 2013 Netflix, Inc.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 
 
@@ -44,21 +44,18 @@ import org.apache.http.message.BasicHttpRequest
 import org.apache.http.params.CoreConnectionPNames
 import org.apache.http.params.HttpParams
 import org.apache.http.protocol.HttpContext
-//import org.slf4j.Logger
-//import org.slf4j.LoggerFactory
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import javax.servlet.http.HttpServletRequest
 import java.util.concurrent.atomic.AtomicReference
 import java.util.zip.GZIPInputStream
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 
 class SimpleHostRoutingFilter extends ZuulFilter {
 
     public static final String CONTENT_ENCODING = "Content-Encoding";
 
-    private static final Logger LOG = LogManager.getLogger(SimpleHostRoutingFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SimpleHostRoutingFilter.class);
     private static final Runnable CLIENTLOADER = new Runnable() {
         @Override
         void run() {
@@ -188,17 +185,13 @@ class SimpleHostRoutingFilter extends ZuulFilter {
         if (Debug.debugRequest()) {
 
             Debug.addRequestDebug("ZUUL:: host=${RequestContext.currentContext.getRouteHost()}")
-			LOG.info("Zuul::");
-			LOG.info("Host>${RequestContext.currentContext.getRouteHost()}");
 
             headers.each {
-                Debug.addRequestDebug("ZUUL::> ${it.name}  ${it.value}");
-				LOG.info("Headers> ${it.name}  ${it.value}");
+                Debug.addRequestDebug("ZUUL::> ${it.name} ${it.value}")
             }
             String query = request.queryString
 
-            Debug.addRequestDebug("ZUUL:: > ${verb}  ${uri}?${query} HTTP/1.1")
-			LOG.info("Query> ${verb}  ${uri}?${query} HTTP/1.1");
+            Debug.addRequestDebug("ZUUL:: > ${verb} ${uri}?${query} HTTP/1.1")
             if (requestEntity != null) {
                 requestEntity = debugRequestEntity(requestEntity)
             }
@@ -212,7 +205,6 @@ class SimpleHostRoutingFilter extends ZuulFilter {
         if (inputStream == null) return null
         String entity = inputStream.getText()
         Debug.addRequestDebug("ZUUL::> ${entity}")
-		LOG.info("Entity> ${entity}")
         return new ByteArrayInputStream(entity.bytes)
     }
 
@@ -244,19 +236,17 @@ class SimpleHostRoutingFilter extends ZuulFilter {
         try {
             httpRequest.setHeaders(headers)
             HttpResponse zuulResponse = forwardRequest(httpclient, httpHost, httpRequest)
-			RequestContext.currentContext.stopRTTTimer();
             return zuulResponse
         } finally {
             // When HttpClient instance is no longer needed,
             // shut down the connection manager to ensure
             // immediate deallocation of all system resources
-//            httpclient.getConnectionManager().shutdown();
+// httpclient.getConnectionManager().shutdown();
         }
 
     }
 
     HttpResponse forwardRequest(HttpClient httpclient, HttpHost httpHost, HttpRequest httpRequest) {
-		RequestContext.currentContext.startRTTTimer();
         return httpclient.execute(httpHost, httpRequest);
     }
 
@@ -358,12 +348,10 @@ class SimpleHostRoutingFilter extends ZuulFilter {
 
 
         if (Debug.debugRequest()) {
-			LOG.info("Origin Response::");
             response.getAllHeaders()?.each { Header header ->
                 if (isValidHeader(header)) {
                     RequestContext.getCurrentContext().addZuulResponseHeader(header.name, header.value);
                     Debug.addRequestDebug("ORIGIN_RESPONSE:: < ${header.name}, ${header.value}")
-											LOG.info("Headers< ${header.name}, ${header.value}")
                 }
             }
 

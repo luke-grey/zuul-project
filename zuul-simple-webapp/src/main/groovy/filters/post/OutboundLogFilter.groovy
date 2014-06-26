@@ -13,7 +13,7 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-package filters.pre
+package filters.post
 
 import com.netflix.zuul.StartServer;
 import com.netflix.zuul.ZuulFilter
@@ -29,18 +29,18 @@ import org.apache.logging.log4j.Logger;
  * Date: 2/3/12
  * Time: 2:48 PM
  */
-class TDRPreTimer extends ZuulFilter {
+class OutboundLogFilter extends ZuulFilter {
 	
-	private static final Logger log = LogManager.getLogger(TDRPreTimer.class);
+	private static final Logger log = LogManager.getLogger(OutboundLogFilter.class);
 	
     @Override
     String filterType() {
-        return "pre"
+        return "post"
     }
 
     @Override
     int filterOrder() {
-        return 1
+        return 1050
     }
 
     @Override
@@ -50,8 +50,14 @@ class TDRPreTimer extends ZuulFilter {
 
     @Override
     Object run() {
-		RequestContext.getCurrentContext().beginTimer();
-		log.info("Began timer");
+		RequestContext ctx = RequestContext.getCurrentContext()
+		ctx.endTimer()
+		log.info("Ended Timer")
+		
+		log.info("Outbound::")
+        ctx.getZuulResponseHeaders()?.each { Pair<String, String> it ->
+			log.info("Headers<  " + it.first() + ":" + it.second());
+        }
     }
 
 }

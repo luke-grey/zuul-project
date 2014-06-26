@@ -47,11 +47,6 @@ import org.apache.logging.log4j.Logger;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
-
-
-
-
-
 import com.netflix.util.Pair;
 import com.netflix.zuul.constants.ZuulHeaders;
 import com.netflix.zuul.util.DeepCopy;
@@ -685,7 +680,7 @@ public class RequestContext extends ConcurrentHashMap<String, Object> {
     }
 
     /**
-     * return the list of requestHeaders to be sent to the origin
+     * return the Map of requestHeaders to be sent to the origin
      *
      * @return the list of requestHeaders to be sent to the origin
      */

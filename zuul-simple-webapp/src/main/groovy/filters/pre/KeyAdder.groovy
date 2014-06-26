@@ -44,8 +44,7 @@ class KeyAdderFilter extends ZuulFilter {
 
     @Override
     Object run() {
-		RequestContext ctx = RequestContext.getCurrentContext();
-		ctx.addZuulRequestHeader("key","1234567890");
+		RequestContext.getCurrentContext().addZuulRequestHeader("key","1234567890");
 		//Debug.addRequestDebug("GREY::"+ctx.request.getRequestURI())
     }
 
