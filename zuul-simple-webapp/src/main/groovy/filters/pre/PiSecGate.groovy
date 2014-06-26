@@ -64,7 +64,7 @@ class PiSecGateV2 extends ZuulFilter {
 					}else{
 						ctx.stopFiltering();
 						log.error("Traffic overflow.")
-						ctx.setErrorCondition("too much traffic. Slow down, cowboy");
+						ctx.setErrorCondition("too much traffic");
 					}
 				}
 			}
@@ -121,7 +121,7 @@ class PiSecGateV2 extends ZuulFilter {
 		}
 		//check if the traffic is passing
 		log.info("Traffic at " + traffic)
-		return traffic<5;
+		return traffic<10;
 	}
 
 }

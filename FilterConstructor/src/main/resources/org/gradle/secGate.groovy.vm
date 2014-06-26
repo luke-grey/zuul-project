@@ -85,24 +85,12 @@ class ${name}SecGateV${version} extends ZuulFilter {
         RequestContext ctx = RequestContext.getCurrentContext();
 		
         // sets origin
-#if(${hosts.size}==1)
-#foreach($host in $hosts)
-		ctx.setRouteHost(new URL("$host"));
-		log.info("Set host to $host");
-#end
-#else
-		switch((hostnNum%${hosts.size()})+1){
-#foreach($host in $hosts)
-			case $velocityCount:
-				ctx.setRouteHost(new URL("$host"));
-				log.info("Set host to $host");
-			break;
-#end
-			default:
-				log.error("No host chosen");
-			break;
-		}
-#end
+		ArrayList<String> hostList = Array.asList($hosts);
+		String host = hostList.get(hostnNum%hostList.size()+1)
+		
+		ctx.setRouteHost(new URL(host));
+		log.info("Set host to "+host);
+		
         // sets custom uri to send to the server
         ctx.setRequestURI("$api"+ctx.getNonURIPath());
 		log.info("At $api"+ctx.getNonURIPath());
