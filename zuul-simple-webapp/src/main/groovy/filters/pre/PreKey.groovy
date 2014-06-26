@@ -19,7 +19,7 @@ import com.netflix.zuul.ZuulFilter
 import com.netflix.zuul.ZuulFilterResult
 import com.netflix.zuul.context.RequestContext
 import com.netflix.zuul.context.Debug
-
+import javax.servlet.http.HttpServletRequest
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -48,14 +48,22 @@ class PreKeyFilter extends ZuulFilter {
     @Override
     Object run() {
 		RequestContext ctx = RequestContext.getCurrentContext();
-		String k = ctx.getZuulRequestHeaders().get("key");
+		HttpServletRequest req = ctx.request
+		String k;
+		boolean stay=true;
+		Iterator headerIt = req.getHeaderNames().iterator()
+		while (headerIt.hasNext()&&stay) {
+			String name=(String) headerIt.next()
+			if(name=="key"){
+				k = req.getHeader(name)
+				ctx.setPermissionKey(k);
+				stay=false;
+			}
+		}
 		if(k==null){
 			ctx.stopFiltering();
 			ctx.setErrorCondition("lack of key");
 			log.error("Request is without key header");
-		}
-		else{
-			ctx.setPermissionKey(k);
 		}
 		ctx.setHasKey(k!=null);
 		
