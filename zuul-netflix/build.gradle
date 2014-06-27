@@ -4,7 +4,7 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 
 dependencies {
-    compile project(':zuul-core')
+    compile project(':zuul-cor')
     
 
     compile 'commons-fileupload:commons-fileupload:1.3'

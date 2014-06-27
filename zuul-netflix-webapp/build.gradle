@@ -7,7 +7,7 @@ apply plugin: 'jetty'
 
 dependencies {
 
-    compile project(':zuul-core')
+    compile project(':zuul-cor')
     compile project(':zuul-netflix')
 
     compile 'com.netflix.karyon:karyon-core:2.0.02'
